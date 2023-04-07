@@ -10,6 +10,8 @@
 
 <?php
 
+define('CAT_API_KEY','live_HgTKbsSxUHylx9SSacC8aY4kBXtzh9S8PNuUbJl8b9kx76K1QHLHIirJe0dtBr2P');
+
 /*echo "coucou";*/
 
 //Préparation de l'appel d'API
@@ -17,7 +19,7 @@ $curl = curl_init();
 
 //Paramétrage de l'appel d'API
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.thecatapi.com/v1/images/search',
+  CURLOPT_URL => 'https://api.thecatapi.com/v1/images/search?has_breeds=1',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10, //max de redirections
@@ -26,6 +28,15 @@ curl_setopt_array($curl, array(
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, // version hhtp - en ce moment est dev le http 2, qui est une réponse instantané
   CURLOPT_CUSTOMREQUEST => 'GET', //type de request
 ));
+
+//on ajoute la clé d'API obtenue sur le site Cat's API
+//Cela permet d'avoir plus de fonctionnalités sur cette API
+$headers = [
+  'x-api-key:'. CAT_API_KEY
+];
+
+//On ajoute l'information dans les Headers de l'appel d'API
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
 //On exécute l'appel d'API
 $response = curl_exec($curl);
@@ -39,11 +50,27 @@ $responseJson = json_decode($response);
 $cat = $responseJson[0];
 //On extrait l'URL de l'image du chat
 $imgUrl = $cat->url;
-//Debug - Afficher le contenu d'une vaiable  --très mauvais pratique car il existe un debuggeur, mais tt le monde le fait
-//var_dump($cat->url);
+//Debug (var_dump($cat->$url))- Afficher le contenu d'une vaiable  --très mauvais pratique car il existe un debuggeur, mais tt le monde le fait
+//var_dump($cat);
 
+//pour récup les infos bien écrites
+//echo '<pre>';
+//print_r($cat);
+//echo '</pre>'; 
+
+//pour n'avoir qu'une partie des infos
+$breed = $cat->breeds[0]; //seul
+//echo '<pre>';
+//print_r($breed); 
+//echo '</pre>'; 
 
 ?>
+
+<!--suite - pour n'avoir qu'une partie des infos-->
+<h1><?php echo $breed->name ?></h1>
+<p><?php echo $breed->description ?></p>
+<p><i><?php echo $breed->temperament ?></i></p>
+<p>Origine : <?php echo $breed->origin ?></p>
 
 <img src="<?php echo $imgUrl ?>"/>
 
